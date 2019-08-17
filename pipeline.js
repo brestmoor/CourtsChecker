@@ -16,7 +16,7 @@ const isFree = (date, times) => {
 };
 
 const checkCourtsEventHandler = (event, context) => {
-    return isFree(date, times)
+    return isFree(date, times).then(console.log)
 };
 
 module.exports.checkCourtsEventHandler = checkCourtsEventHandler;
