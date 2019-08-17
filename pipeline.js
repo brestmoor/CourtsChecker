@@ -15,9 +15,8 @@ const isFree = (date, times) => {
         .then(reservationStatuses => reservationStatuses.every(status => status === false));
 };
 
-const isFreeScheduled = (event, context) => {
-    console.log(event.data
-        ? Buffer.from(event.data, 'base64').toString() : 'No message received for court checking.')
+const checkCourtsEventHandler = (event, context) => {
+    return isFree(date, times)
 };
 
-module.exports.isFreeScheduled = isFreeScheduled
+module.exports.checkCourtsEventHandler = checkCourtsEventHandler;
