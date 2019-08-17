@@ -16,7 +16,8 @@ const isFree = (date, times) => {
 };
 
 const isFreeScheduled = (event, context) => {
-    console.log(event)
+    console.log(event.data
+        ? Buffer.from(event.data, 'base64').toString() : 'No message received for court checking.')
 };
 
 module.exports.isFreeScheduled = isFreeScheduled
