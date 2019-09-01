@@ -4,6 +4,8 @@ const parser = require('./parser');
 const timeUtils = require('./timeUtils');
 const messageFormatter = require('./messageFormatter.js');
 const SubscriptionsService = require('./SubscriptionsService');
+const forEach = require('./arrayUtils.js').forEach;
+const onCompletion = require('./promiseUtils.js').onCompletion;
 
 const vapidKeys = {
     publicKey:
@@ -59,7 +61,7 @@ const checkCourtsEventHandler = (event, context) => {
         .then(areFreePromises => Promise.all(areFreePromises))
         .then(checkResults => checkResults.filter(checkResult => checkResult.isFree))
         .then(freeResults => freeResults.map(freeResult => webpush.sendNotification(freeResult.subscription, messageFormatter.format(freeResult))))
-        .then(sentNotification => sentNotification.then(console.log).catch(console.log))
+        .then(forEach(onCompletion(console.log, console.log)))
         .catch(console.log)
 };
 
