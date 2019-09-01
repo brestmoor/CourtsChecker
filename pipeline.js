@@ -1,9 +1,9 @@
-const webpush = require('web-push')
+const webpush = require('web-push');
 const fetching = require('./fetching');
 const parser = require('./parser');
 const timeUtils = require('./timeUtils');
 const messageFormatter = require('./messageFormatter.js');
-const SubscriptionsService = require('./SubscriptionsService')
+const SubscriptionsService = require('./SubscriptionsService');
 
 const vapidKeys = {
     publicKey:
@@ -16,12 +16,6 @@ webpush.setVapidDetails(
     vapidKeys.publicKey,
     vapidKeys.privateKey
 );
-
-// const date = '25.08.2019';
-//
-// const times = [{hour: 7, minute: 0}];
-//
-// const periods = [{date: date, times: times}, {date: date, times: [{hour: 19, minute: 0}]}];
 
 const logIn = () => {
     return fetching.getSessId()
