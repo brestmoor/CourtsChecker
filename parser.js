@@ -1,4 +1,7 @@
 const cheerio = require('cheerio');
+const timeUtils = require('./timeUtils');
+
+const addManyHalfHours = timeUtils.addManyHalfHours;
 
 const isReservedFor = (html, hour, minute) => {
     let badmintonColumn = findBadmintonColumn(html);
@@ -13,7 +16,8 @@ const isReservedFor = (html, hour, minute) => {
     allReservations
         .forEach(time => reservationMap.set(time, (reservationMap.get(time) || 0) + 1));
 
-    return reservationMap.get(formatTime({hour: hour, minute: minute})) === 5;
+    let numberOfReservations = reservationMap.get(timeUtils.formatTime({hour: hour, minute: minute}));
+    return numberOfReservations >= 5;
 };
 
 const findBadmintonColumn = (html) => {
@@ -42,45 +46,20 @@ const findSavedReserved = (html) => {
         .get();
 
     return found
-        .map(formatTime)
+        .map(timeUtils.formatTime)
 };
 
-const formatTime = (time) => {
-    return time.hour + '_' + formatMinute(time.minute)
-};
 
 const findBlockedReserved = (html) => {
     const $ = cheerio.load(html);
     return $('.reservation_closed').not('.saved_reservation_closed')
         .map((idx, el) => getTimeFromBidi($(el).attr('id')))
         .get()
-        .map(formatTime)
+        .map(timeUtils.formatTime)
 };
 
 const getNumberFromPx = (sizePx) => {
     return parseInt(sizePx.split('px')[0])
-};
-
-const addManyHalfHours = (time, number) => {
-    if (number === 0) {
-        return time;
-    } else {
-        let newTime = addHalfHour(time);
-        return addManyHalfHours(newTime, number - 1)
-    }
-};
-
-const addHalfHour = (time) => {
-    let {hour, minute} = time;
-    if (minute === 30) {
-        return {hour: hour + 1, minute: 0}
-    } else {
-        return {hour: hour, minute: 30};
-    }
-};
-
-const formatMinute = (minute) => {
-    return ("0" + minute).slice(-2)
 };
 
 const getTimeFromBidi = (bidi) => {

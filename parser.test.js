@@ -3,6 +3,7 @@ const fs = require('fs');
 
 courts = fs.readFileSync('./testCourts.html', 'UTF-8');
 const isReservedFor = parser.isReservedFor;
+const minuteDifference = parser.minuteDifference;
 
 test('should tell if court is reserved', () => {
 
@@ -51,3 +52,5 @@ test('should tell when court is not reserved', () => {
 
     times.forEach(time => expect(isReservedFor(courts, time.hour, time.minute)).toBeFalsy())
 });
+
+
