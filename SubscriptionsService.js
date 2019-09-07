@@ -2,22 +2,33 @@ const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 
 admin.initializeApp(functions.config().firebase);
-// let serviceAccount = require('./courtschecks-firebase-adminsdk-ier7j-6796243a95.json');
+// let serviceAccount = require('./total-glider-242914-fdee55c675d7.json');
 // admin.initializeApp({
 //     credential: admin.credential.cert(serviceAccount),
-//     databaseURL: 'https://courtschecks.firebaseio.com'
+//     databaseURL: 'https://total-glider-242914.firebaseio.com'
 // });
 
 class SubscriptionsService {
 
     constructor() {
         this.db = admin.firestore();
+        this.markAsExpired = this.markAsExpired.bind(this);
+        this.getNonExpiredSubscriptions = this.getNonExpiredSubscriptions.bind(this);
     }
 
     getNonExpiredSubscriptions() {
         return this.db.collection('subscriptions')
             .where('expired', '==', false)
             .get()
+    }
+
+
+    markAsExpired(subscriptionId) {
+        return this.db.collection('subscriptions')
+            .doc(subscriptionId)
+            .set({
+                expired: true
+            }, {merge: true})
     }
 }
 
