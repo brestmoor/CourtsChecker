@@ -20,7 +20,7 @@ class SubscriptionsService {
     getNonExpiredSubscriptions() {
         return this.db.collection('subscriptions')
             .where('expired', '==', false)
-            .where('fromTimeDate', '>=', timeUtils.convertToCET(new Date()))
+            .where('fromTimeDate', '>=', new Date())
             .get()
     }
 
