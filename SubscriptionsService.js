@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const timeUtils = require('./timeUtils.js')
 
 admin.initializeApp(functions.config().firebase);
 // let serviceAccount = require('./total-glider-242914-fdee55c675d7.json');
@@ -19,6 +20,7 @@ class SubscriptionsService {
     getNonExpiredSubscriptions() {
         return this.db.collection('subscriptions')
             .where('expired', '==', false)
+            .where('fromTimeDate', '>=', timeUtils.convertToCET(new Date()))
             .get()
     }
 

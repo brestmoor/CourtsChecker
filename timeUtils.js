@@ -39,6 +39,11 @@ const formatMinute = (minute) => {
 const formatDate = (date) => {
     return format.asString('dd.MM.yyyy', date)
 };
+
+const convertToCET = (date) => {
+    return new Date(date.toLocaleString('en-US', {timeZone: 'Europe/Warsaw'}))
+};
+
 module.exports.minuteDifference = minuteDifference;
 module.exports.addManyHalfHours = addManyHalfHours;
 module.exports.addHalfHour = addHalfHour;
@@ -46,3 +51,4 @@ module.exports.formatTime = formatTime;
 module.exports.formatMinute = formatMinute;
 module.exports.formatDate = formatDate;
 module.exports.formatTimeReadable = formatTimeReadable;
+module.exports.convertToCET = convertToCET;
