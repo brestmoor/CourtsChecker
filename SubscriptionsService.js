@@ -2,12 +2,12 @@ const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const timeUtils = require('./timeUtils.js')
 
-admin.initializeApp(functions.config().firebase);
-// let serviceAccount = require('./total-glider-242914-fdee55c675d7.json');
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-//     databaseURL: 'https://total-glider-242914.firebaseio.com'
-// });
+// admin.initializeApp(functions.config().firebase);
+let serviceAccount = require('./total-glider-242914-fdee55c675d7.json');
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://total-glider-242914.firebaseio.com'
+});
 
 class SubscriptionsService {
 

@@ -1,4 +1,4 @@
-const pipeline = require('/pipeline');``
+const pipeline = require('../pipeline');
 
 export default (req, res) => {
     pipeline.checkCourtsEventHandler();
