@@ -5,7 +5,8 @@ const timeUtils = require('./timeUtils');
 const messageFormatter = require('./messageFormatter.js');
 const SubscriptionsService = require('./SubscriptionsService');
 const mailing = require('./mailing.js');
-
+const AreFreeChecker = require('./AreFreeChecker.js');
+const _ = require('underscore')
 
 const vapidKeys = {
     publicKey:
@@ -46,27 +47,23 @@ const mapToPeriod = (subscription) => {
     }
 };
 
-const isFree = (cookie, period) => {
-    console.log("checking for: " + JSON.stringify(period) + "\n\n");
-    return fetching.fetchTable(cookie, period.date)
-        .then(table => table.schedule)
-        .then(schedule => period.times.map(time => parser.isReservedFor(schedule, time.hour, time.minute)))
-        .then(reservationStatuses => ({
-            id: period.id,
-            isFree: reservationStatuses.every(status => status === false),
-            date: period.date,
-            times: period.times,
-            subscription: period.subscription
-        }));
+const checkIfAreFree = (cookie, periods) => {
+    const periodsGrouped = _.groupBy(periods, period => period.date);
+    const areFreeChecker = new AreFreeChecker();
+    const areFreeResults = [];
+    for (let date in periodsGrouped) {
+        areFreeResults.push(areFreeChecker.areFree(cookie, date, periodsGrouped[date]))
+    }
+    return areFreeResults;
 };
 
 const checkCourtsEventHandler = (event, context) => {
     const subscriptionsService = new SubscriptionsService();
     return subscriptionsService.getNonExpiredSubscriptions()
         .then(subscriptions => subscriptions.docs.map(mapToPeriod))
-        .then(periods => logIn().then(cookie => periods.map(period => isFree(cookie, period))))
+        .then(periods => logIn().then(cookie => checkIfAreFree(cookie, periods)))
         .then(areFreePromises => Promise.all(areFreePromises))
-        .then(checkResults => checkResults.filter(checkResult => checkResult.isFree))
+        .then(checkResults => checkResults.flat().filter(checkResult => checkResult.isFree))
         .then(freeResults => freeResults.map(freeResult =>
             webpush.sendNotification(freeResult.subscription, messageFormatter.format(freeResult))
                 .then(() => freeResult.id).catch(err => mailing.sendAlert("Error during webpush: \n" + JSON.stringify(err)).catch(console.log))
