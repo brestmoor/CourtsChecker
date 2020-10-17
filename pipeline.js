@@ -7,6 +7,13 @@ const SubscriptionsService = require('./SubscriptionsService');
 const mailing = require('./mailing.js');
 const AreFreeChecker = require('./AreFreeChecker.js');
 const _ = require('underscore')
+const firebase = require('firebase');
+
+const firebaseApp = firebase.initializeApp({
+    apiKey: "AIzaSyA4jEaLGE06Pjefzdw1adg6KWm7iwprwas",
+    authDomain: "total-glider-242914.firebaseapp.com",
+    projectId: "total-glider-242914",
+});
 
 const vapidKeys = {
     publicKey:
@@ -64,17 +71,20 @@ const checkCourtsEventHandler = (event, context) => {
         .then(periods => logIn().then(cookie => checkIfAreFree(cookie, periods)))
         .then(areFreePromises => Promise.all(areFreePromises))
         .then(checkResults => checkResults.flat().filter(checkResult => checkResult.isFree))
-        .then(freeResults => freeResults.map(freeResult =>
+        .then(freeResults => {
+            console.log("Found " + freeResults.length + " free results.")
+            return freeResults.map(freeResult =>
             webpush.sendNotification(freeResult.subscription, messageFormatter.format(freeResult))
                 .then(() => freeResult.id).catch(err => mailing.sendAlert("Error during webpush: \n" + JSON.stringify(err)).catch(console.log))
-        ))
+        )})
         .then(idsPromises => Promise.all(idsPromises))
-        .then(ids => ids.forEach(subscriptionsService.markAsExpired))
+        .then(ids => ids.map(subscriptionsService.markAsExpired))
+        .then(markedAsExpired => Promise.all(markedAsExpired))
         .catch(err => mailing.sendAlert((("Error during pipeline: \n" + JSON.stringify(err)))).catch(console.log));
 };
 
 checkCourtsEventHandler()
-    .then(console.log)
+    .then(() => firebaseApp.delete())
     .catch(console.log);
 
 module.exports.checkCourtsEventHandler = checkCourtsEventHandler;
